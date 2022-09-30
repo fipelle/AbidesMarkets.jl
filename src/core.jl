@@ -69,6 +69,6 @@ and un-nest them returns a single dataframe with the logs from all the agents wa
 for debugging and exploration.
 """
 function parse_logs_df(end_state::Dict)
-    parse_logs_df = pyimport(abides_core.utils.parse_logs_df);
+    parse_logs_df = pyimport("abides_core.utils").parse_logs_df;
     return parse_logs_df(end_state);
 end

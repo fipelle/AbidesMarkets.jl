@@ -35,7 +35,7 @@ using AbidesMarkets;
 using DataFrames, DataFramesMeta, Dates, Plots, Statistics;
 
 # Build runnable configuration
-config = AbidesMarkets.build_config("rmsc04", (seed=0));
+config = AbidesMarkets.build_config("rmsc04", (seed=0, ));
 println(sort(collect(keys(config)))); # <- show keys in `config` in alphabetical order
 
 # Run simulation
@@ -74,5 +74,5 @@ scatter!(fig, L2_times, L2["asks"][:,5,1], markersize=2.5, markerstrokewidth=0, 
 ylims!(fig, 100000-100, 100000+100);
 
 # Looking at agents logs
-logs_df = parse_logs_df(end_state);
+logs_df = AbidesMarkets.parse_logs_df(end_state);
 ```
