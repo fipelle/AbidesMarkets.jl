@@ -45,5 +45,18 @@ end_state = AbidesMarkets.run(config);
 order_book = end_state["agents"][1].order_books["ABM"]; # Julia starts indexing from 1, not 0
 
 # Get L1 snapshots
-best_bids, best_asks = get_L1_snapshots(order_book);
+best_bids, best_asks = AbidesMarkets.get_L1_snapshots(order_book);
+
+# All times are in ns from 1970, this loop converts them to a more readable format
+best_bids_time = Time[];
+best_asks_time = Time[];
+for i in axes(best_bids, 1) # same as best_asks by default
+    # x*1e-9 converts ns to seconds, the remaining part of the conversion is performed with the Dates library functions
+    push!(best_bids_time, Time(unix2datetime(best_bids[i, 1]*1e-9)));
+    push!(best_asks_time, Time(unix2datetime(best_asks[i, 1]*1e-9)));
+end
+
+# Generate plots
+fig = plot(best_bids_time, best_bids[:, 2]);
+plot!(fig, best_asks_time, best_asks[:, 2]);
 ```
