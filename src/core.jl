@@ -52,11 +52,23 @@ np_array_to_matrix(X::Matrix{Float64}) = convert(Matrix{Union{Missing, Float64}}
 """
     get_L1_snapshots(order_book::PyObject)
 
-Get the L1 snapshots from the order book.
+Get the L1 snapshots from the order book in a format compatible with Julia.
 """
 function get_L1_snapshots(order_book::PyObject)
     L1 = order_book.get_L1_snapshots();
     best_bids = np_array_to_matrix(L1["best_bids"]);
     best_asks = np_array_to_matrix(L1["best_asks"]);
     return best_bids, best_asks;
+end
+
+"""
+    parse_logs_df(end_state::Dict)
+
+Takes the `end_state` dictionary returned by an ABIDES simulation, goes through all the agents, extracts their log,
+and un-nest them returns a single dataframe with the logs from all the agents warning: this is meant to be used 
+for debugging and exploration.
+"""
+function parse_logs_df(end_state::Dict)
+    parse_logs_df = pyimport(abides_core.utils.parse_logs_df);
+    return parse_logs_df(end_state);
 end
