@@ -7,8 +7,8 @@ module AbidesMarkets
 
     # Custom dependencies
     local_path = dirname(@__FILE__);
-    include("$(local_path)/methods.jl");
+    include("$(local_path)/core.jl");
 
     # Export
-    # export TODO
+    export build_config, run;
 end
