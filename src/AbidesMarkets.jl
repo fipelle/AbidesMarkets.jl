@@ -3,7 +3,7 @@ __precompile__()
 module AbidesMarkets
 
     # Dependencies
-    using DataFrames, DataFramesMeta, DataStructures, Dates, Logging, PyCall, Statistics;
+    using DataFrames, DataFramesMeta, Dates, Logging, PyCall, Statistics;
 
     # Custom dependencies
     local_path = dirname(@__FILE__);
