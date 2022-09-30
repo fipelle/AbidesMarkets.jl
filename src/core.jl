@@ -12,11 +12,11 @@ function build_config(config_suffix::String, kwargs::NamedTuple)
 end
 
 """
-    run(config)
+    run(config::Dict)
 
 Run simulation using the configuration in `config`.
 """
-function run(config)
+function run(config::Dict)
     abides = pyimport("abides_core.abides");
     return abides.run(config);
 end
