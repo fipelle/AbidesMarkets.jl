@@ -56,7 +56,20 @@ for i in axes(best_bids, 1) # same as best_asks by default
     push!(best_asks_time, Time(unix2datetime(best_asks[i, 1]*1e-9)));
 end
 
-# Generate plots
-fig = plot(best_bids_time, best_bids[:, 2]);
-plot!(fig, best_asks_time, best_asks[:, 2]);
+# Generate plots for L1 output
+fig = plot(best_bids_time, best_bids[:, 2], linecolor=:orange, label=nothing);
+plot!(fig, best_asks_time, best_asks[:, 2], linecolor=:steelblue, label=nothing);
+ylims!(fig, 100000-100, 100000+100);
+
+# Order book history L2
+L2 = order_book.get_L2_snapshots(nlevels=10);
+L2_times = Time[];
+for instant in L2["times"]
+    push!(L2_times, Time(unix2datetime(instant*1e-9)));
+end
+
+# Generate plots for L2 output (plotting fifth best bid and fifth best ask)
+fig = plot(scatter(L2_times, L2["bids"][:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:orange, label=nothing));
+scatter!(fig, L2_times, L2["asks"][:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:steelblue, label=nothing);
+ylims!(fig, 100000-100, 100000+100);
 ```
