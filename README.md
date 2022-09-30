@@ -43,4 +43,7 @@ end_state = AbidesMarkets.run(config);
 
 # Retrieving results from `end_state`
 order_book = end_state["agents"][1].order_books["ABM"]; # Julia starts indexing from 1, not 0
+
+# Get L1 snapshots
+best_bids, best_asks = get_L1_snapshots(order_book);
 ```
