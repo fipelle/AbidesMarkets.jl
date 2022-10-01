@@ -50,7 +50,7 @@ L1 = AbidesMarkets.get_L1_snapshots(order_book);
 # All times are in ns from 1970, this loop converts them to a more readable format
 best_bids_time = Time[];
 best_asks_time = Time[];
-for i in axes(best_bids, 1) # same as best_asks by default
+for i in axes(L1.best_bids, 1) # same as best_asks by default
     # x*1e-9 converts ns to seconds, the remaining part of the conversion is performed with the Dates library functions
     push!(best_bids_time, Time(unix2datetime(L1.best_bids[i, 1]*1e-9)));
     push!(best_asks_time, Time(unix2datetime(L1.best_asks[i, 1]*1e-9)));
