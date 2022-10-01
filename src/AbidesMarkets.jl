@@ -7,8 +7,10 @@ module AbidesMarkets
 
     # Custom dependencies
     local_path = dirname(@__FILE__);
+    include("$(local_path)/types.jl");
     include("$(local_path)/core.jl");
-
+    include("$(local_path)/utils.jl");
+    
     # Export
     export build_config, run, get_L1_snapshots, parse_logs_df;
 end
