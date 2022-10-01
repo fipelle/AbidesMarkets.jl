@@ -1,0 +1,2 @@
+1. Check the internals in Julia to make sure they are working fine;
+2. Check output vs Python to make sure that it is correct.
