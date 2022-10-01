@@ -1,5 +1,5 @@
 # Dependencies
-include("./AbidesMarkets.jl/src/AbidesMarkets.jl");
+include("../src/AbidesMarkets.jl");
 using Main.AbidesMarkets;
 using DataFrames, DataFramesMeta, Dates, Plots, Statistics;
 
