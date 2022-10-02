@@ -39,6 +39,4 @@ using CSV, DataFrames, Dates, Statistics, Test;
     L2_asks_q_benchmark = CSV.read("./benchmarks/rmsc04/L2_asks_q.csv", DataFrame)[:, 2:end] |> Array{Union{Missing, Float64}};
     @test L2.asks[:,:,1] == L2_asks_p_benchmark;
     @test L2.asks[:,:,2] == L2_asks_q_benchmark;
-
-    @test L2.times == some benchmark
 end
