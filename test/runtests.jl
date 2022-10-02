@@ -1,7 +1,7 @@
 # Dependencies
 include("../src/AbidesMarkets.jl");
 using Main.AbidesMarkets;
-using DataFrames, DataFramesMeta, Dates, Plots, Statistics;
+using Dates, Statistics, Test;
 
 @testset "rmsc04 core functions" begin
 
