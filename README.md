@@ -45,34 +45,31 @@ end_state = AbidesMarkets.run(config);
 order_book = end_state["agents"][1].order_books["ABM"]; # Julia starts indexing from 1, not 0
 
 # Get L1 snapshots
-best_bids, best_asks = AbidesMarkets.get_L1_snapshots(order_book);
+L1 = AbidesMarkets.get_L1_snapshots(order_book);
 
 # All times are in ns from 1970, this loop converts them to a more readable format
 best_bids_time = Time[];
 best_asks_time = Time[];
-for i in axes(best_bids, 1) # same as best_asks by default
+for i in axes(L1.best_bids, 1) # same as best_asks by default
     # x*1e-9 converts ns to seconds, the remaining part of the conversion is performed with the Dates library functions
-    push!(best_bids_time, Time(unix2datetime(best_bids[i, 1]*1e-9)));
-    push!(best_asks_time, Time(unix2datetime(best_asks[i, 1]*1e-9)));
+    push!(best_bids_time, Time(unix2datetime(L1.best_bids[i, 1]*1e-9)));
+    push!(best_asks_time, Time(unix2datetime(L1.best_asks[i, 1]*1e-9)));
 end
 
 # Generate plots for L1 output
-fig = plot(best_bids_time, best_bids[:, 2], linecolor=:orange, label=nothing);
-plot!(fig, best_asks_time, best_asks[:, 2], linecolor=:steelblue, label=nothing);
+fig = plot(best_bids_time, L1.best_bids[:, 2], linecolor=:orange, label=nothing);
+plot!(fig, best_asks_time, L1.best_asks[:, 2], linecolor=:steelblue, label=nothing);
 ylims!(fig, 100000-100, 100000+100);
 
 # Order book history L2
-L2 = order_book.get_L2_snapshots(nlevels=10);
+L2 = AbidesMarkets.get_L2_snapshots(order_book, 10);
 L2_times = Time[];
-for instant in L2["times"]
+for instant in L2.times
     push!(L2_times, Time(unix2datetime(instant*1e-9)));
 end
 
 # Generate plots for L2 output (plotting fifth best bid and fifth best ask)
-fig = plot(scatter(L2_times, L2["bids"][:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:orange, label=nothing));
-scatter!(fig, L2_times, L2["asks"][:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:steelblue, label=nothing);
+fig = plot(scatter(L2_times, L2.bids[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:orange, label=nothing));
+scatter!(fig, L2_times, L2.asks[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:steelblue, label=nothing);
 ylims!(fig, 100000-100, 100000+100);
-
-# Looking at agents logs
-logs_df = AbidesMarkets.parse_logs_df(end_state);
 ```

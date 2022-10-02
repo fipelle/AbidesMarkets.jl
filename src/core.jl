@@ -22,15 +22,15 @@ function run(config::Dict)
 end
 
 """
-    np_array_to_matrix(X::Matrix{PyCall.PyObject})
+    ndarray_to_matrix(X::Matrix{PyCall.PyObject})
 
 Converts `X` into a Matrix{Union{Missing, Float64}} handling `None` appropriately.
 
-    np_array_to_matrix(X::Matrix{Float64})
+    ndarray_to_matrix(X::Matrix{Float64})
 
 Converts `X` into a Matrix{Union{Missing, Float64}} for internal consistency.
 """
-function np_array_to_matrix(X::Matrix{PyCall.PyObject})
+function ndarray_to_matrix(X::Matrix{PyCall.PyObject})
     out = zeros(size(X)) |> Matrix{Union{Missing, Float64}};
     for j in axes(out, 2), i in axes(out, 1)
         try
@@ -47,28 +47,31 @@ function np_array_to_matrix(X::Matrix{PyCall.PyObject})
     return out;
 end
 
-np_array_to_matrix(X::Matrix{Float64}) = convert(Matrix{Union{Missing, Float64}}, X);
+ndarray_to_matrix(X::Matrix{Float64}) = convert(Matrix{Union{Missing, Float64}}, X);
 
 """
     get_L1_snapshots(order_book::PyObject)
 
-Get the L1 snapshots from the order book in a format compatible with Julia.
+Get the L1 snapshots from the order book in an ad-hoc Julia structure.
 """
 function get_L1_snapshots(order_book::PyObject)
-    L1 = order_book.get_L1_snapshots();
-    best_bids = np_array_to_matrix(L1["best_bids"]);
-    best_asks = np_array_to_matrix(L1["best_asks"]);
-    return best_bids, best_asks;
+    L1_python = order_book.get_L1_snapshots();
+    return SnapshotL1(
+        ndarray_to_matrix(L1_python["best_bids"]), 
+        ndarray_to_matrix(L1_python["best_asks"])
+    );
 end
 
 """
-    parse_logs_df(end_state::Dict)
+    get_L2_snapshots(order_book::PyObject, nlevels::Int64)
 
-Takes the `end_state` dictionary returned by an ABIDES simulation, goes through all the agents, extracts their log,
-and un-nest them returns a single dataframe with the logs from all the agents warning: this is meant to be used 
-for debugging and exploration.
+Get the L2 snapshots from the order book in an ad-hoc Julia structure.
 """
-function parse_logs_df(end_state::Dict)
-    parse_logs_df = pyimport("abides_core.utils").parse_logs_df;
-    return parse_logs_df(end_state);
+function get_L2_snapshots(order_book::PyObject, nlevels::Int64)
+    L2_python = order_book.get_L2_snapshots(nlevels=nlevels);
+    return SnapshotL2(
+        L2_python["times"], 
+        L2_python["bids"], 
+        L2_python["asks"]
+    );
 end
