@@ -18,13 +18,19 @@ order_book = end_state["agents"][0].order_books["ABM"]
 
 # Get L1 snapshots
 L1 = order_book.get_L1_snapshots()
+
+# Store L1 snapshots
 pd.DataFrame(L1['best_bids'], columns=['time', 'p', 'q']).to_csv("./benchmarks/rmsc04/L1_best_bids.csv")
 pd.DataFrame(L1['best_asks'], columns=['time', 'p', 'q']).to_csv("./benchmarks/rmsc04/L1_best_asks.csv")
 
 # Get L2 snapshots
-L2 = order_book.get_L2_snapshots(nlevels=10)
+nlevels=10
+L2 = order_book.get_L2_snapshots(nlevels=nlevels)
+
+# Store L2 snapshots
+L2_mnemonics = [f'level{i+1}' for i in range(nlevels)]
 pd.DataFrame(L2['times'], columns=['time']).to_csv("./benchmarks/rmsc04/L2_times.csv")
-pd.DataFrame(L2['bids'][:,:,0], columns=['p']).to_csv("./benchmarks/rmsc04/L2_bids_p.csv")
-pd.DataFrame(L2['bids'][:,:,1], columns=['q']).to_csv("./benchmarks/rmsc04/L2_bids_q.csv")
-pd.DataFrame(L2['asks'][:,:,0], columns=['p']).to_csv("./benchmarks/rmsc04/L2_asks_p.csv")
-pd.DataFrame(L2['asks'][:,:,1], columns=['q']).to_csv("./benchmarks/rmsc04/L2_asks_q.csv")
+pd.DataFrame(L2['bids'][:,:,0], columns=L2_mnemonics).to_csv("./benchmarks/rmsc04/L2_bids_p.csv")
+pd.DataFrame(L2['bids'][:,:,1], columns=L2_mnemonics).to_csv("./benchmarks/rmsc04/L2_bids_q.csv")
+pd.DataFrame(L2['asks'][:,:,0], columns=L2_mnemonics).to_csv("./benchmarks/rmsc04/L2_asks_p.csv")
+pd.DataFrame(L2['asks'][:,:,1], columns=L2_mnemonics).to_csv("./benchmarks/rmsc04/L2_asks_q.csv")
