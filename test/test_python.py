@@ -8,7 +8,7 @@ from abides_markets.configs import rmsc04
 
 # Build runnable configuration
 config = rmsc04.build_config(seed=0)
-config.keys()
+sorted(config.keys())
 
 # Run simulation
 end_state = abides.run( config )
