@@ -56,7 +56,10 @@ Get the L1 snapshots from the order book in an ad-hoc Julia structure.
 """
 function get_L1_snapshots(order_book::PyObject)
     L1_python = order_book.get_L1_snapshots();
-    return SnapshotL1(ndarray_to_matrix(L1_python["best_bids"]), ndarray_to_matrix(L1_python["best_asks"]));
+    return SnapshotL1(
+        ndarray_to_matrix(L1_python["best_bids"]), 
+        ndarray_to_matrix(L1_python["best_asks"])
+    );
 end
 
 """
@@ -66,5 +69,9 @@ Get the L2 snapshots from the order book in an ad-hoc Julia structure.
 """
 function get_L2_snapshots(order_book::PyObject, nlevels::Int64)
     L2_python = order_book.get_L2_snapshots(nlevels=nlevels);
-    return SnapshotL2(L2_python["times"], L2_python["bids"], L2_python["asks"]);
+    return SnapshotL2(
+        L2_python["times"], 
+        L2_python["bids"], 
+        L2_python["asks"]
+    );
 end
