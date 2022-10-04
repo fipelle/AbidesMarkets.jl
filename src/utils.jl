@@ -28,16 +28,13 @@ function aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time
         if index > 1
 
             # Aggregation window
-            window = (times .<= aggregated_times[index]);
-            if index > 2
-                window .&= (times .> aggregated_times[index-1]);
-            end
-
+            window = aggregated_times[index-1] .< times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
+            
             # Aggregate and push
             push!(aggregated_X, f(X[window], f_args...; f_kwargs...));
         end
     end
-
+    
     # Return output
     return aggregated_X;
 end
