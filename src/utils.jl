@@ -11,12 +11,35 @@ end
 """
     aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
 
-
+Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 """
-function aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
+function aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
     
-    # Time aggregation with `f`
-    aggregated_times = collect(minimum(times):time_step:maximum(times));
+    # Initialise output variable
+    aggregated_X = Float64[];
+    
+    # Convenient aggregator
+    aggregated_times = minimum(times):time_step:maximum(times);
+
+    # Loop over each period
+    for index in axes(aggregated_times, 1)
+        
+        # Skip the first instant
+        if index > 1
+
+            # Aggregation window
+            window = (times .<= aggregated_times[index]);
+            if index > 2
+                window .&= (times .> aggregated_times[index-1]);
+            end
+
+            # Aggregate and push
+            push!(aggregated_X, f(X[window], f_args...; f_kwargs...));
+        end
+    end
+
+    # Return output
+    return aggregated_X;
 end
 
 """
