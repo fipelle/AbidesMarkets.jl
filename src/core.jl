@@ -24,14 +24,14 @@ end
 """
     ndarray_to_matrix(X::Matrix{PyCall.PyObject})
 
-Converts `X` into a Matrix{Union{Missing, Float64}} handling `None` appropriately.
+Converts `X` into a JMatrix{Float64} handling `None` appropriately.
 
     ndarray_to_matrix(X::Matrix{Float64})
 
-Converts `X` into a Matrix{Union{Missing, Float64}} for internal consistency.
+Converts `X` into a JMatrix{Float64} for internal consistency.
 """
 function ndarray_to_matrix(X::Matrix{PyCall.PyObject})
-    out = zeros(size(X)) |> Matrix{Union{Missing, Float64}};
+    out = zeros(size(X)) |> JMatrix{Float64};
     for j in axes(out, 2), i in axes(out, 1)
         try
             out[i,j] = convert(Float64, X[i,j]);
@@ -47,7 +47,7 @@ function ndarray_to_matrix(X::Matrix{PyCall.PyObject})
     return out;
 end
 
-ndarray_to_matrix(X::Matrix{Float64}) = convert(Matrix{Union{Missing, Float64}}, X);
+ndarray_to_matrix(X::Matrix{Float64}) = convert(JMatrix{Float64}, X);
 
 """
     get_L1_snapshots(order_book::PyObject)

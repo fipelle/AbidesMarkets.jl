@@ -4,8 +4,8 @@
 Structure containing the L1 snapshots.
 """
 struct SnapshotL1
-    best_bids::Matrix{Union{Missing, Float64}}
-    best_asks::Matrix{Union{Missing, Float64}}
+    best_bids::JMatrix{Float64}
+    best_asks::JMatrix{Float64}
 end
 
 """

@@ -12,5 +12,5 @@ module AbidesMarkets
     include("$(local_path)/utils.jl");
     
     # Export
-    export build_config, run, get_L1_snapshots, parse_logs_df;
+    export build_config, run, get_L1_snapshots, parse_logs_df, aggregate_LOB_measurement, eop_LOB_measurement, avg_LOB_measurement;
 end

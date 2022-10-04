@@ -9,11 +9,11 @@ function parse_logs_df(end_state::Dict)
 end
 
 """
-    aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
+    aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
 
 Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 """
-function aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
+function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
     
     # Initialise output variable
     aggregated_X = Float64[];
@@ -40,15 +40,15 @@ function aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time
 end
 
 """
-    eop_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period)
+    eop_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period)
 
 Aggregate `X` by returing the EOP measurement taken at the specified `time_step`.
 """
-eop_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, last);
+eop_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, last);
 
 """
-    avg_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period)
+    avg_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period)
 
 Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `time_step`.
 """
-avg_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, mean; f_kwargs=(dims=1, ));
+avg_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, mean; f_kwargs=(dims=1, ));
