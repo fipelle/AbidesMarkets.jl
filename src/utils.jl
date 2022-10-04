@@ -18,7 +18,7 @@ function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, 
     # Initialise output variables
     aggregated_X = Union{Missing, Float64}[];
     aggregated_times = minimum(times):time_step:maximum(times);
-    
+
     # Loop over each period
     for index in axes(aggregated_times, 1)
         
@@ -27,10 +27,11 @@ function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, 
 
             # Aggregation window
             window = aggregated_times[index-1] .< times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
+            X_window = skipmissing(X[window]);
 
             # Aggregate and push
-            if sum(window) > 0
-                push!(aggregated_X, f(X[window], f_args...; f_kwargs...)...);
+            if length(X_window) > 0 # implicitely controls both for the size of window and the number of missing observations in X_window
+                push!(aggregated_X, f(X_window, f_args...; f_kwargs...)...);
             else
                 push!(aggregated_X, missing);
             end
