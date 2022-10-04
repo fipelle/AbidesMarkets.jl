@@ -9,31 +9,26 @@ function parse_logs_df(end_state::Dict)
 end
 
 """
-    aggregate_LOB_measurement(X::Vector{Float64}, times::DateTime, frequency::String, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
+    aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
 
 
 """
-function aggregate_LOB_measurement(X::Vector{Float64}, times::DateTime, frequency::String, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
+function aggregate_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
     
-    # Error management
-    if frequency ∉ ["seconds", "minutes", "hours"]
-        error("Frequency must be either 'seconds', 'minutes' or 'hours'!");
-    end
-
     # Time aggregation with `f`
-    
+    aggregated_times = collect(minimum(times):time_step:maximum(times));
 end
 
 """
-    eop_LOB_measurement(X::Vector{Float64}, times::DateTime, frequency::String)
+    eop_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period)
 
-Aggregate `X` by returing the EOP measurement taken at the specified `frequency`.
+Aggregate `X` by returing the EOP measurement taken at the specified `time_step`.
 """
-eop_LOB_measurement(X::Vector{Float64}, times::DateTime, frequency::String) = aggregate_LOB_measurement(X, times, frequency, last);
+eop_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, last);
 
 """
-    avg_LOB_measurement(X::Vector{Float64}, times::DateTime, frequency::String)
+    avg_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period)
 
-Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `frequency`.
+Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `time_step`.
 """
-avg_LOB_measurement(X::Vector{Float64}, times::DateTime, frequency::String) = aggregate_LOB_measurement(X, times, frequency, mean; f_kwargs=(dims=1, ));
+avg_LOB_measurement(X::Vector{Float64}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, mean; f_kwargs=(dims=1, ));
