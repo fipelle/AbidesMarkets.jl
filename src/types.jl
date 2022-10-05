@@ -15,6 +15,6 @@ Structure containing the L2 snapshots.
 """
 struct SnapshotL2
     times::Vector{Int64}
-    bids::Array{Float64, 3}
-    asks::Array{Float64, 3}
+    bids::JArray{Float64, 3}
+    asks::JArray{Float64, 3}
 end
