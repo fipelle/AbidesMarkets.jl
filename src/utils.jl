@@ -43,18 +43,18 @@ function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, 
 end
 
 """
-    eop_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period)
+    aggregate_LOB_measurement_eop(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period)
 
 Aggregate `X` by returing the EOP measurement taken at the specified `time_step`.
 """
-eop_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, last);
+aggregate_LOB_measurement_eop(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, last);
 
 """
-    avg_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period)
+    aggregate_LOB_measurement_avg(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period)
 
 Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `time_step`.
 """
-avg_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, mean; f_kwargs=(dims=1, ));
+aggregate_LOB_measurement_avg(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, mean; f_kwargs=(dims=1, ));
 
 """
     compare_aggregated_LOB_measurements(X::JMatrix{Float64}, Y::JMatrix{Float64}, f_ticks::Function, f_time::Function)
