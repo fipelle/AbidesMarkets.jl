@@ -16,8 +16,8 @@ Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
     
     # Initialise output variables
-    aggregated_X = Union{Missing, Float64}[];
     aggregated_times = minimum(times):time_step:maximum(times);
+    aggregated_X = convert(JMatrix{Float64}, zeros(1, length(aggregated_times)));
 
     # Loop over each period
     for index in axes(aggregated_times, 1)
@@ -29,11 +29,11 @@ function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, 
             window = aggregated_times[index-1] .< times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
             X_window = skipmissing(X[window]);
 
-            # Aggregate and push
+            # Aggregate and update `aggregated_X`
             if length(X_window) > 0 # implicitely controls both for the size of window and the number of missing observations in X_window
-                push!(aggregated_X, f(X_window, f_args...; f_kwargs...)...);
+                aggregated_X[1, index] = f(X_window, f_args...; f_kwargs...);
             else
-                push!(aggregated_X, missing);
+                aggregated_X[1, index] = missing;
             end
         end
     end
@@ -55,3 +55,22 @@ eop_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{T
 Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `time_step`.
 """
 avg_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period) = aggregate_LOB_measurement(X, times, time_step, mean; f_kwargs=(dims=1, ));
+
+"""
+    compare_aggregated_LOB_measurements(X::JMatrix{Float64}, Y::JMatrix{Float64}, f_ticks::Function, f_time::Function)
+
+Compare two vectors of aggregated LOB measurements. 
+
+Each column of `X` and `Y` denotes a different point in time, while each row is a different entry (perhaps different levels).
+"""
+function compare_aggregated_LOB_measurements(X::JMatrix{Float64}, Y::JMatrix{Float64}, f_ticks::Function, f_time::Function; f_ticks_args::Tuple=(), f_ticks_kwargs::NamedTuple=NamedTuple(), f_time_args::Tuple=(), f_time_kwargs::NamedTuple=NamedTuple())
+
+    # Loop over each point in time
+    statistics_ticks = zeros(size(X, 1));
+    for index in axes(X, 2)
+        statistics_ticks[index] = f_ticks(X[:, index], Y[:, index], f_ticks_args...; f_ticks_kwargs...);
+    end
+    
+    # Return output
+    return f_time(statistics_ticks, f_time...; f_ticks_kwargs...);
+end
