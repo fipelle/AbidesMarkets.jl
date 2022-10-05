@@ -63,11 +63,11 @@ function get_L1_snapshots(order_book::PyObject)
 end
 
 """
-    adjust_L2_snapshots(X::Array{Float64})
+    adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
 
 Adjust inconsistent use of zeros at source to indicate missing observations in bids/asks.
 """
-function adjust_L2_snapshots(X::Array{Float64})
+function adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
     missing_entries = iszero.(view(X, :, :, 1)) .| iszero.(view(X, :, :, 2)); # zero prices or volumes at given price
     adjusted_X = convert(JArray{Float64}, X);
     adjusted_X[missing_entries, :] .= missing;
