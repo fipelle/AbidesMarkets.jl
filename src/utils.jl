@@ -74,3 +74,10 @@ function compare_aggregated_LOB_measurements(X::JMatrix{Float64}, Y::JMatrix{Flo
     # Return output
     return f_time(statistics_ticks, f_time_args...; f_time_kwargs...);
 end
+
+"""
+    compare_aggregated_LOB_measurements_mse(X::JMatrix{Float64}, Y::JMatrix{Float64})
+
+Compare two vectors of aggregated LOB measurements through the MSE.
+"""
+compare_aggregated_LOB_measurements_mse(X::JMatrix{Float64}, Y::JMatrix{Float64}) = compare_aggregated_LOB_measurements(X, Y, (x, y) -> mean(skipmissing(x-y).^2), mean);
