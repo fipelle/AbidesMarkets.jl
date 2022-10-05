@@ -72,5 +72,5 @@ function compare_aggregated_LOB_measurements(X::JMatrix{Float64}, Y::JMatrix{Flo
     end
     
     # Return output
-    return f_time(statistics_ticks, f_time...; f_ticks_kwargs...);
+    return f_time(statistics_ticks, f_time_args...; f_time_kwargs...);
 end
