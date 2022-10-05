@@ -73,5 +73,6 @@ fig = plot(scatter(L2_times, L2.bids[:,5,1], markersize=2.5, markerstrokewidth=0
 scatter!(fig, L2_times, L2.asks[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:steelblue, label=nothing);
 ylims!(fig, 100000-100, 100000+100);
 
-aggregated_bids, aggregated_times = aggregate_LOB_measurement_avg(L2.bids[:,1,1], L2_times, Minute(1))
+L2_bids_avg, L2_bids_avg_times = aggregate_LOB_measurement_avg(L2.bids[:,5,1], L2_times, Minute(1));
+L2_bids_eop, L2_bids_avg_times = aggregate_LOB_measurement_eop(L2.bids[:,5,1], L2_times, Minute(1));
 ```

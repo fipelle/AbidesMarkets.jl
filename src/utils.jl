@@ -8,6 +8,9 @@ function parse_logs_df(end_state::Dict)
     return parse_logs_df(end_state);
 end
 
+Dates.floor(X::Dates.Time, P::Dates.Period) = floor(DateTime("$(today())T$(X)", "yyyy-mm-ddTHH:MM:SS.s"), P) |> Time;
+Dates.ceil(X::Dates.Time, P::Dates.Period) = ceil(DateTime("$(today())T$(X)", "yyyy-mm-ddTHH:MM:SS.s"), P) |> Time;
+
 """
     aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
 
@@ -16,7 +19,7 @@ Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 function aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
     
     # Initialise output variables
-    aggregated_times = minimum(times):time_step:maximum(times);
+    aggregated_times = floor(minimum(times), Minute(5)):time_step:ceil(maximum(times), Minute(5));
     aggregated_X = convert(JMatrix{Float64}, zeros(1, length(aggregated_times)));
     aggregated_X[1] = missing; # always skip the very first instant for internal consistency
 
