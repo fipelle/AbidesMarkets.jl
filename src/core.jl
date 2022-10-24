@@ -24,14 +24,14 @@ end
 """
     ndarray_to_matrix(X::Matrix{PyCall.PyObject})
 
-Converts `X` into a Matrix{Union{Missing, Float64}} handling `None` appropriately.
+Converts `X` into a JMatrix{Float64} handling `None` appropriately.
 
     ndarray_to_matrix(X::Matrix{Float64})
 
-Converts `X` into a Matrix{Union{Missing, Float64}} for internal consistency.
+Converts `X` into a JMatrix{Float64} for internal consistency.
 """
 function ndarray_to_matrix(X::Matrix{PyCall.PyObject})
-    out = zeros(size(X)) |> Matrix{Union{Missing, Float64}};
+    out = convert(JMatrix{Float64}, zeros(size(X)));
     for j in axes(out, 2), i in axes(out, 1)
         try
             out[i,j] = convert(Float64, X[i,j]);
@@ -47,7 +47,7 @@ function ndarray_to_matrix(X::Matrix{PyCall.PyObject})
     return out;
 end
 
-ndarray_to_matrix(X::Matrix{Float64}) = convert(Matrix{Union{Missing, Float64}}, X);
+ndarray_to_matrix(X::Matrix{Float64}) = convert(JMatrix{Float64}, X);
 
 """
     get_L1_snapshots(order_book::PyObject)
@@ -63,6 +63,18 @@ function get_L1_snapshots(order_book::PyObject)
 end
 
 """
+    adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
+
+Adjust inconsistent use of zeros at source to indicate missing observations in bids/asks.
+"""
+function adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
+    missing_entries = iszero.(view(X, :, :, 1)) .| iszero.(view(X, :, :, 2)); # zero prices or volumes at given price
+    adjusted_X = convert(JArray{Float64}, X);
+    adjusted_X[missing_entries, :] .= missing;
+    return adjusted_X;
+end
+
+"""
     get_L2_snapshots(order_book::PyObject, nlevels::Int64)
 
 Get the L2 snapshots from the order book in an ad-hoc Julia structure.
@@ -70,8 +82,8 @@ Get the L2 snapshots from the order book in an ad-hoc Julia structure.
 function get_L2_snapshots(order_book::PyObject, nlevels::Int64)
     L2_python = order_book.get_L2_snapshots(nlevels=nlevels);
     return SnapshotL2(
-        L2_python["times"], 
-        L2_python["bids"], 
-        L2_python["asks"]
+        L2_python["times"],
+        adjust_L2_snapshots(L2_python["bids"]),
+        adjust_L2_snapshots(L2_python["asks"])
     );
 end
