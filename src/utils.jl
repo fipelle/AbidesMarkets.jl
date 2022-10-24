@@ -12,7 +12,7 @@ Dates.floor(X::Dates.Time, P::Dates.Period) = floor(DateTime("$(today())T$(X)", 
 Dates.ceil(X::Dates.Time, P::Dates.Period) = ceil(DateTime("$(today())T$(X)", "yyyy-mm-ddTHH:MM:SS.s"), P) |> Time;
 
 """
-    aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
+    aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
 
 Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 """
@@ -90,3 +90,38 @@ end
 Compare two vectors of aggregated LOB measurements through the MSE.
 """
 compare_aggregated_LOB_measurements_mse(X::JMatrix{Float64}, Y::JMatrix{Float64}) = compare_aggregated_LOB_measurements(X, Y, (x, y) -> mean(skipmissing(x-y).^2), mean);
+
+"""
+    aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
+
+Aggregate `X` by taking its `f` transformation at the specified `time_step`.
+"""
+function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
+    
+    # Generate times
+    times = Time[];
+    for instant in X.times
+        push!(times, Time(unix2datetime(instant*1e-9)));
+    end
+
+    # Get number of L2 levels
+    nlevels = size(X.bids, 2);
+
+    # Memory pre-allocation for output's components
+    aggregated_times = floor(minimum(times), Minute(5)):time_step:ceil(maximum(times), Minute(5));
+    aggregated_bids = zeros(length(aggregated_times), nlevels, 2);
+    aggregated_asks = zeros(length(aggregated_times), nlevels, 2);
+
+    # Loop over volumes and prices
+    for j=1:2
+
+        # Loop over levels
+        for i=1:nlevels
+            aggregated_bids[:, i, j], _ = aggregate_LOB_measurement(X.bids[:, i], times, time_step, f, f_args=f_args, f_kwargs=f_kwargs)';
+            aggregated_asks[:, i, j], _ = aggregate_LOB_measurement(X.asks[:, i], times, time_step, f, f_args=f_args, f_kwargs=f_kwargs)';
+        end
+    end
+
+    # Generate and return aggregated L2 snapshot
+    return SnapshotL2(aggregated_times, aggregated_bids, aggregated_asks);
+end
