@@ -111,13 +111,13 @@ function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_
 
         # Loop over levels
         for i=1:nlevels
-            aggregated_bids[:, i, j], _ = aggregate_LOB_measurement(X.bids[:, i, j], L2.times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
-            aggregated_asks[:, i, j], _ = aggregate_LOB_measurement(X.asks[:, i, j], L2.times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
+            aggregated_bids[:, i, j], _ = aggregate_LOB_measurement(X.bids[:, i, j], X.times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
+            aggregated_asks[:, i, j], _ = aggregate_LOB_measurement(X.asks[:, i, j], X.times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
         end
     end
 
     # Generate and return aggregated L2 snapshot
-    return SnapshotL2(aggregated_times, aggregated_bids, aggregated_asks);
+    return SnapshotL2(aggregated_times[2:end], aggregated_bids[2:end, :, :], aggregated_asks[2:end, :, :]);
 end
 
 """
