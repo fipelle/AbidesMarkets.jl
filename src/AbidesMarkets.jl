@@ -15,5 +15,5 @@ module AbidesMarkets
     # Export
     export build_config, run, get_L1_snapshots, get_L2_snapshots,
            parse_logs_df, aggregate_LOB_measurement, aggregate_LOB_measurement_eop, aggregate_LOB_measurement_avg,
-           compare_aggregated_LOB_measurements, compare_aggregated_LOB_measurements_mse;
+           compare_aggregated_LOB_measurements, compare_aggregated_LOB_measurements_mse, aggregate_L2_snapshot, aggregate_L2_snapshot_eop, aggregate_L2_snapshot_avg;
 end

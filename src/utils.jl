@@ -119,3 +119,17 @@ function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_
     # Generate and return aggregated L2 snapshot
     return SnapshotL2(aggregated_times, aggregated_bids, aggregated_asks);
 end
+
+"""
+    aggregate_L2_snapshot_eop(X::SnapshotL2, times::Vector{Time}, time_step::Period)
+
+Aggregate `X` by returing the EOP measurement taken at the specified `time_step`.
+"""
+aggregate_L2_snapshot_eop(X::SnapshotL2, times::Vector{Time}, time_step::Period) = aggregate_L2_snapshot(X, times, time_step, last);
+
+"""
+    aggregate_L2_snapshot_avg(X::SnapshotL2, times::Vector{Time}, time_step::Period)
+
+Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `time_step`.
+"""
+aggregate_L2_snapshot_avg(X::SnapshotL2, times::Vector{Time}, time_step::Period) = aggregate_L2_snapshot(X, times, time_step, mean; f_kwargs=(dims=1, ));
