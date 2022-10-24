@@ -98,17 +98,11 @@ Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 """
 function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
     
-    # Generate times
-    times = Time[];
-    for instant in X.times
-        push!(times, Time(unix2datetime(instant*1e-9)));
-    end
-
     # Get number of L2 levels
     nlevels = size(X.bids, 2);
 
     # Memory pre-allocation for output's components
-    aggregated_times = floor(minimum(times), Minute(5)):time_step:ceil(maximum(times), Minute(5));
+    aggregated_times = floor(minimum(L2.times), Minute(5)):time_step:ceil(maximum(L2.times), Minute(5));
     aggregated_bids = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
     aggregated_asks = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
 
