@@ -109,16 +109,16 @@ function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_
 
     # Memory pre-allocation for output's components
     aggregated_times = floor(minimum(times), Minute(5)):time_step:ceil(maximum(times), Minute(5));
-    aggregated_bids = zeros(length(aggregated_times), nlevels, 2);
-    aggregated_asks = zeros(length(aggregated_times), nlevels, 2);
+    aggregated_bids = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
+    aggregated_asks = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
 
-    # Loop over volumes and prices
+    # Loop over prices and volumes
     for j=1:2
 
         # Loop over levels
         for i=1:nlevels
-            aggregated_bids[:, i, j], _ = aggregate_LOB_measurement(X.bids[:, i], times, time_step, f, f_args=f_args, f_kwargs=f_kwargs)';
-            aggregated_asks[:, i, j], _ = aggregate_LOB_measurement(X.asks[:, i], times, time_step, f, f_args=f_args, f_kwargs=f_kwargs)';
+            aggregated_bids[:, i, j], _ = aggregate_LOB_measurement(X.bids[:, i, j], times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
+            aggregated_asks[:, i, j], _ = aggregate_LOB_measurement(X.asks[:, i, j], times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
         end
     end
 
