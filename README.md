@@ -63,16 +63,12 @@ ylims!(fig, 100000-100, 100000+100);
 
 # Order book history L2
 L2 = AbidesMarkets.get_L2_snapshots(order_book, 10);
-L2_times = Time[];
-for instant in L2.times
-    push!(L2_times, Time(unix2datetime(instant*1e-9)));
-end
 
 # Generate plots for L2 output (plotting fifth best bid and fifth best ask)
-fig = plot(scatter(L2_times, L2.bids[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:orange, label=nothing));
-scatter!(fig, L2_times, L2.asks[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:steelblue, label=nothing);
+fig = plot(scatter(L2.times, L2.bids[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:orange, label=nothing));
+scatter!(fig, L2.times, L2.asks[:,5,1], markersize=2.5, markerstrokewidth=0, markercolor=:steelblue, label=nothing);
 ylims!(fig, 100000-100, 100000+100);
 
-L2_bids_avg, L2_bids_avg_times = aggregate_LOB_measurement_avg(L2.bids[:,5,1], L2_times, Minute(1));
-L2_bids_eop, L2_bids_avg_times = aggregate_LOB_measurement_eop(L2.bids[:,5,1], L2_times, Minute(1));
+L2_bids_avg, L2_bids_avg_times = aggregate_LOB_measurement_avg(L2.bids[:,5,1], L2.times, Minute(1));
+L2_bids_eop, L2_bids_avg_times = aggregate_LOB_measurement_eop(L2.bids[:,5,1], L2.times, Minute(1));
 ```

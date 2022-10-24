@@ -80,9 +80,19 @@ end
 Get the L2 snapshots from the order book in an ad-hoc Julia structure.
 """
 function get_L2_snapshots(order_book::PyObject, nlevels::Int64)
+    
+    # Get L2 snapshot from Python
     L2_python = order_book.get_L2_snapshots(nlevels=nlevels);
+
+    # Generate times
+    times = Time[];
+    for instant in L2_python["times"]
+        push!(times, Time(unix2datetime(instant*1e-9)));
+    end
+
+    # Return output
     return SnapshotL2(
-        L2_python["times"],
+        times,
         adjust_L2_snapshots(L2_python["bids"]),
         adjust_L2_snapshots(L2_python["asks"])
     );
