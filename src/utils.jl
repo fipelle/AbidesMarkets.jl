@@ -92,11 +92,11 @@ Compare two vectors of aggregated LOB measurements through the MSE.
 compare_aggregated_LOB_measurements_mse(X::JMatrix{Float64}, Y::JMatrix{Float64}) = compare_aggregated_LOB_measurements(X, Y, (x, y) -> mean(skipmissing(x-y).^2), mean);
 
 """
-    aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
+    aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
 
-Aggregate `X` by taking its `f` transformation at the specified `time_step`.
+Take the last bids and asks in `X` approximately every `time_step`.
 """
-function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
+function aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
     
     # Get number of L2 levels
     nlevels = size(X.bids, 2);
@@ -105,31 +105,25 @@ function aggregate_L2_snapshot(X::SnapshotL2, time_step::Period, f::Function; f_
     aggregated_times = floor(minimum(X.times), Minute(5)):time_step:ceil(maximum(X.times), Minute(5));
     aggregated_bids = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
     aggregated_asks = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
+    
+    # Loop over each period
+    for index in axes(aggregated_times, 1)
+        
+        # Skip the first instant
+        if index > 1
 
-    # Loop over prices and volumes
-    for j=1:2
+            # Aggregation window
+            window = aggregated_times[index-1] .< times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
+            last_in_window = findlast(window);
 
-        # Loop over levels
-        for i=1:nlevels
-            aggregated_bids[:, i, j], _ = aggregate_LOB_measurement(X.bids[:, i, j], X.times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
-            aggregated_asks[:, i, j], _ = aggregate_LOB_measurement(X.asks[:, i, j], X.times, time_step, f, f_args=f_args, f_kwargs=f_kwargs);
+            # Loop over prices and volumes -> take last entry
+            for j=1:2
+                aggregated_bids[index, :, j] = X.bids[last_in_window, :, j];
+                aggregated_asks[index, :, j] = X.asks[last_in_window, :, j];
+            end
         end
     end
 
-    # Generate and return aggregated L2 snapshot
+    # Generate and return aggregated L2 snapshot (skip the first entry, since it is missing by construction)
     return SnapshotL2(aggregated_times[2:end], aggregated_bids[2:end, :, :], aggregated_asks[2:end, :, :]);
 end
-
-"""
-    aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
-
-Aggregate `X` by returing the EOP measurement taken at the specified `time_step`.
-"""
-aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period) = aggregate_L2_snapshot(X, time_step, last);
-
-"""
-    aggregate_L2_snapshot_avg(X::SnapshotL2, time_step::Period)
-
-Aggregate `X` by returing the average (non-overlapping) measurement taken at the specified `time_step`.
-"""
-aggregate_L2_snapshot_avg(X::SnapshotL2, time_step::Period) = aggregate_L2_snapshot(X, time_step, mean; f_kwargs=(dims=1, ));
