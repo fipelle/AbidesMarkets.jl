@@ -113,7 +113,7 @@ function aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
         if index > 1
 
             # Aggregation window
-            window = aggregated_times[index-1] .< times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
+            window = aggregated_times[index-1] .< X.times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
             last_in_window = findlast(window);
 
             # Loop over prices and volumes -> take last entry
