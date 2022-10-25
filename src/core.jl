@@ -8,7 +8,7 @@ Build a configuration starting from the one of the official rmscXX templates.
 """
 function build_config(config_suffix::String, kwargs::NamedTuple)
     rmscXX = pyimport("abides_markets.configs.$(config_suffix)");
-    return rmscXX.build_config(kwargs...);
+    return rmscXX.build_config(; kwargs...);
 end
 
 """
