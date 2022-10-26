@@ -1,5 +1,5 @@
 """
-    build_config(kwargs::NamedTuple)
+    build_config(config_suffix::String, kwargs::NamedTuple)
 
 Build a configuration starting from the one of the official rmscXX templates.
 
