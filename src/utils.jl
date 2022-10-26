@@ -125,5 +125,5 @@ function aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
     end
 
     # Generate and return aggregated L2 snapshot (skip the first entry, since it is missing by construction)
-    return SnapshotL2(aggregated_times[2:end], aggregated_bids[2:end, :, :], aggregated_asks[2:end, :, :]);
+    return SnapshotL2(aggregated_times[2:end], adjust_L2_snapshots(aggregated_bids[2:end, :, :]), adjust_L2_snapshots(aggregated_asks[2:end, :, :]));
 end
