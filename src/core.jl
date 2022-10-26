@@ -64,6 +64,7 @@ end
 
 """
     adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
+    adjust_L2_snapshots(Union{JArray{Float64, 3}, JArray{Int64, 3}})
 
 Adjust inconsistent use of zeros at source to indicate missing observations in bids/asks.
 """
@@ -71,6 +72,24 @@ function adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
     missing_entries = iszero.(view(X, :, :, 1)) .| iszero.(view(X, :, :, 2)); # zero prices or volumes at given price
     adjusted_X = convert(JArray{Float64}, X);
     adjusted_X[missing_entries, :] .= missing;
+    return adjusted_X;
+end
+
+function adjust_L2_snapshots(X::Union{JArray{Float64, 3}, JArray{Int64, 3}})
+    
+    # Check for zeros in prices or volumes
+    new_missing_entries = view(X, :, :, 1) .=== 0;
+    new_missing_entries .|= view(X, :, :, 2) .=== 0;
+    
+    # Check for missings in prices or volumes
+    new_missing_entries .|= ismissing.(view(X, :, :, 1));
+    new_missing_entries .|= ismissing.(view(X, :, :, 2));
+
+    # New dataset
+    adjusted_X = copy(X);
+    adjusted_X[new_missing_entries, :] .= missing;
+
+    # Return output
     return adjusted_X;
 end
 
