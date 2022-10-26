@@ -114,12 +114,29 @@ function aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
 
             # Aggregation window
             window = aggregated_times[index-1] .< X.times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
-            last_in_window = findlast(window);
 
             # Loop over prices and volumes -> take last entry
+            if sum(window) > 0
+                last_in_window = findlast(window);
+
+                for j=1:2
+                    aggregated_bids[index, :, j] = X.bids[last_in_window, :, j];
+                    aggregated_asks[index, :, j] = X.asks[last_in_window, :, j];
+                end
+
+            # If there are no observed times in `window`
+            else
+                for j=1:2
+                    aggregated_bids[index, :, j] .= missing;
+                    aggregated_asks[index, :, j] .= missing;
+                end
+            end
+
+        # if `index == 1`
+        else
             for j=1:2
-                aggregated_bids[index, :, j] = X.bids[last_in_window, :, j];
-                aggregated_asks[index, :, j] = X.asks[last_in_window, :, j];
+                aggregated_bids[index, :, j] .= missing;
+                aggregated_asks[index, :, j] .= missing;
             end
         end
     end
