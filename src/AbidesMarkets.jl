@@ -4,8 +4,7 @@ module AbidesMarkets
 
     # Dependencies
     using DataFrames, DataFramesMeta, Dates, Logging, MessyTimeSeries, PyCall, Statistics;
-    using Infiltrator;
-    
+        
     # Custom dependencies
     local_path = dirname(@__FILE__);
     include("$(local_path)/types.jl");
