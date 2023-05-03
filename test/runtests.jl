@@ -1,7 +1,5 @@
 # Dependencies
-include("../src/AbidesMarkets.jl");
-using Main.AbidesMarkets;
-using CSV, DataFrames, Dates, MessyTimeSeries, Statistics, Test;
+using AbidesMarkets, CSV, DataFrames, Dates, MessyTimeSeries, Statistics, Test;
 
 @testset "rmsc04 core functions" begin
 
