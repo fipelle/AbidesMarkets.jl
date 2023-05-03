@@ -3,8 +3,9 @@ __precompile__()
 module AbidesMarkets
 
     # Dependencies
-    using DataFrames, DataFramesMeta, Dates, Logging, MessyTimeSeries, PyCall, Statistics;
-    
+    using DataFrames, DataFramesMeta, Dates, Logging, PyCall, Statistics;
+    using MessyTimeSeries: JVector, JMatrix, JArray;
+
     # Custom dependencies
     local_path = dirname(@__FILE__);
     include("$(local_path)/types.jl");
