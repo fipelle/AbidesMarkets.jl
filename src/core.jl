@@ -1,5 +1,5 @@
 """
-    build_config(kwargs::NamedTuple)
+    build_config(config_suffix::String, kwargs::NamedTuple)
 
 Build a configuration starting from the one of the official rmscXX templates.
 
@@ -8,7 +8,7 @@ Build a configuration starting from the one of the official rmscXX templates.
 """
 function build_config(config_suffix::String, kwargs::NamedTuple)
     rmscXX = pyimport("abides_markets.configs.$(config_suffix)");
-    return rmscXX.build_config(kwargs...);
+    return rmscXX.build_config(; kwargs...);
 end
 
 """
@@ -64,6 +64,7 @@ end
 
 """
     adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
+    adjust_L2_snapshots(Union{JArray{Float64, 3}, JArray{Int64, 3}})
 
 Adjust inconsistent use of zeros at source to indicate missing observations in bids/asks.
 """
@@ -74,15 +75,43 @@ function adjust_L2_snapshots(X::Union{Array{Float64, 3}, Array{Int64, 3}})
     return adjusted_X;
 end
 
+function adjust_L2_snapshots(X::Union{JArray{Float64, 3}, JArray{Int64, 3}})
+    
+    # Check for zeros in prices or volumes
+    new_missing_entries = view(X, :, :, 1) .=== 0;
+    new_missing_entries .|= view(X, :, :, 2) .=== 0;
+    
+    # Check for missings in prices or volumes
+    new_missing_entries .|= ismissing.(view(X, :, :, 1));
+    new_missing_entries .|= ismissing.(view(X, :, :, 2));
+
+    # New dataset
+    adjusted_X = copy(X);
+    adjusted_X[new_missing_entries, :] .= missing;
+
+    # Return output
+    return adjusted_X;
+end
+
 """
     get_L2_snapshots(order_book::PyObject, nlevels::Int64)
 
 Get the L2 snapshots from the order book in an ad-hoc Julia structure.
 """
 function get_L2_snapshots(order_book::PyObject, nlevels::Int64)
+    
+    # Get L2 snapshot from Python
     L2_python = order_book.get_L2_snapshots(nlevels=nlevels);
+
+    # Generate times
+    times = Time[];
+    for instant in L2_python["times"]
+        push!(times, Time(unix2datetime(instant*1e-9)));
+    end
+
+    # Return output
     return SnapshotL2(
-        L2_python["times"],
+        times,
         adjust_L2_snapshots(L2_python["bids"]),
         adjust_L2_snapshots(L2_python["asks"])
     );

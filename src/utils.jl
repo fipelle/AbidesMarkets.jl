@@ -12,7 +12,7 @@ Dates.floor(X::Dates.Time, P::Dates.Period) = floor(DateTime("$(today())T$(X)", 
 Dates.ceil(X::Dates.Time, P::Dates.Period) = ceil(DateTime("$(today())T$(X)", "yyyy-mm-ddTHH:MM:SS.s"), P) |> Time;
 
 """
-    aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple, f_kwargs::NamedTuple)
+    aggregate_LOB_measurement(X::Union{Vector{Float64}, JVector{Float64}}, times::Vector{Time}, time_step::Period, f::Function; f_args::Tuple=(), f_kwargs::NamedTuple=NamedTuple())
 
 Aggregate `X` by taking its `f` transformation at the specified `time_step`.
 """
@@ -90,3 +90,57 @@ end
 Compare two vectors of aggregated LOB measurements through the MSE.
 """
 compare_aggregated_LOB_measurements_mse(X::JMatrix{Float64}, Y::JMatrix{Float64}) = compare_aggregated_LOB_measurements(X, Y, (x, y) -> mean(skipmissing(x-y).^2), mean);
+
+"""
+    aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
+
+Take the last bids and asks in `X` approximately every `time_step`.
+"""
+function aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
+    
+    # Get number of L2 levels
+    nlevels = size(X.bids, 2);
+
+    # Memory pre-allocation for output's components
+    aggregated_times = floor(minimum(X.times), Minute(5)):time_step:ceil(maximum(X.times), Minute(5));
+    aggregated_bids = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
+    aggregated_asks = convert(JArray{Float64}, zeros(length(aggregated_times), nlevels, 2));
+    
+    # Loop over each period
+    for index in axes(aggregated_times, 1)
+        
+        # Skip the first instant
+        if index > 1
+
+            # Aggregation window
+            window = aggregated_times[index-1] .< X.times .<= aggregated_times[index]; # always skip the very first instant for internal consistency
+
+            # Loop over prices and volumes -> take last entry
+            if sum(window) > 0
+                last_in_window = findlast(window);
+
+                for j=1:2
+                    aggregated_bids[index, :, j] = X.bids[last_in_window, :, j];
+                    aggregated_asks[index, :, j] = X.asks[last_in_window, :, j];
+                end
+
+            # If there are no observed times in `window`
+            else
+                for j=1:2
+                    aggregated_bids[index, :, j] .= missing;
+                    aggregated_asks[index, :, j] .= missing;
+                end
+            end
+
+        # if `index == 1`
+        else
+            for j=1:2
+                aggregated_bids[index, :, j] .= missing;
+                aggregated_asks[index, :, j] .= missing;
+            end
+        end
+    end
+
+    # Generate and return aggregated L2 snapshot (skip the first entry, since it is missing by construction)
+    return SnapshotL2(aggregated_times[2:end], adjust_L2_snapshots(aggregated_bids[2:end, :, :]), adjust_L2_snapshots(aggregated_asks[2:end, :, :]));
+end
