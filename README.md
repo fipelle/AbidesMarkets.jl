@@ -26,7 +26,7 @@ Or, equivalently, via the `Pkg` API:
 julia> import Pkg; Pkg.add("AbidesMarkets")
 ```
 
-# Example
+## Example
 
 The following example shows how to replicate in Julia the [official demo](https://github.com/jpmorganchase/abides-jpmc-public/blob/main/notebooks/demo_ABIDES-Markets.ipynb) for ABIDES-Markets: 
 ```julia
