@@ -20,7 +20,7 @@ test = ["Test"]
 
 [compat]
 CSV = "0.9"
-DataFrames = "1.5"
+DataFrames = "1"
 DataFramesMeta = "0.10"
 MessyTimeSeries = "0.2"
 PyCall = "1.95"
