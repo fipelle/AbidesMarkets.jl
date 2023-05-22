@@ -5,7 +5,8 @@ module AbidesMarkets
     # Dependencies
     using DataFrames, DataFramesMeta, Dates, Logging, PyCall, Statistics;
     using MessyTimeSeries: JVector, JMatrix, JArray;
-
+    import Base: length;
+    
     # Custom dependencies
     local_path = dirname(@__FILE__);
     include("$(local_path)/types.jl");
