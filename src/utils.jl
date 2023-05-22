@@ -144,3 +144,10 @@ function aggregate_L2_snapshot_eop(X::SnapshotL2, time_step::Period)
     # Generate and return aggregated L2 snapshot (skip the first entry, since it is missing by construction)
     return SnapshotL2(aggregated_times[2:end], adjust_L2_snapshots(aggregated_bids[2:end, :, :]), adjust_L2_snapshots(aggregated_asks[2:end, :, :]));
 end
+
+"""
+    length(X::SnapshotL2)
+
+Number of observations in the LOB contained in `X`.
+"""
+length(X::SnapshotL2) = size(X.asks, 1);
