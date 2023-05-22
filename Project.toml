@@ -1,6 +1,6 @@
 name = "AbidesMarkets"
 uuid = "58d4ea2d-0711-406a-8537-437c3b89a4c2"
-version = "0.1"
+version = "0.1.1"
 
 [deps]
 CSV = "336ed68f-0bac-5ca0-87d4-7b16caf5d00b"
